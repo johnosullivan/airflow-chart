@@ -14,8 +14,10 @@ metadata:
 {{- with .Values.labels }}
 {{ toYaml . | indent 4 }}
 {{- end }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     tier: airflow
     component: webserver
@@ -24,4 +26,4 @@ spec:
     - name: airflow-ui
       protocol: TCP
       port: {{ .Values.ports.airflowUI }}
-      targetPort: {{ .Values.ports.airflowUI }}
+      targetPort: {{ .Values.ports.airflowUI }} 
