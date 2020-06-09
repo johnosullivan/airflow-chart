@@ -416,3 +416,6 @@ postgresql:
   enabled: true
   postgresqlPassword: postgres
   postgresqlUsername: postgres
+
+# AWS enabled
+awsEnabled: false
