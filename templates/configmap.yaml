@@ -29,7 +29,13 @@ data:
 {{- if .Values.ingress.enabled }}
     base_url = {{ printf "https://%s/%s/airflow" (include "deployments_subdomain" .) .Release.Name }}
 {{- end }}
+    # base_url = http://dashboard.airflow.brighthive.net:8080
     enable_proxy_fix = True
+    proxy_fix_x_host = 3
+    proxy_fix_x_port = 3
+    proxy_fix_x_prefix = 1
+    proxy_fix_x_for = 1
+    proxy_fix_x_proto = 1
     expose_config = True
     rbac = True
 
@@ -112,7 +118,8 @@ data:
     SQLALCHEMY_DATABASE_URI = conf.get('core', 'SQL_ALCHEMY_CONN')
 
     # Flask-WTF flag for CSRF
-    CSRF_ENABLED = True
+    CSRF_ENABLED = False
+    WTF_CSRF_SSL_STRICT = False
 
     # ----------------------------------------------------
     # AUTHENTICATION CONFIG
@@ -136,15 +143,15 @@ data:
     def pod_mutation_hook(pod: Pod):
 
         extra_labels = {
-            "kubernetes_executor": "False",
-            "kubernetes_pod_operator": "False"
+            "kubernetes-executor": "False",
+            "kubernetes-pod-operator": "False"
         }
 
         if 'airflow-worker' in pod.labels.keys() or \
                 conf.get('core', 'EXECUTOR') == "KubernetesExecutor":
-            extra_labels["kubernetes_executor"] = "True"
+            extra_labels["kubernetes-executor"] = "True"
         else:
-            extra_labels["kubernetes_pod_operator"] = "True"
+            extra_labels["kubernetes-pod-operator"] = "True"
 
         pod.labels.update(extra_labels)
         pod.tolerations += {{ toJson .Values.podMutation.tolerations }}

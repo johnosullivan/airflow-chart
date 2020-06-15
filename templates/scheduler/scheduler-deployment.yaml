@@ -32,8 +32,10 @@ spec:
   serviceName: {{ .Release.Name }}-scheduler
 {{- end }}
   replicas: 1
+{{- if not $stateful }}
   strategy:
     type: Recreate
+{{- end }}
   selector:
     matchLabels:
       tier: airflow
@@ -78,7 +80,7 @@ spec:
       {{- end }}
       initContainers:
         - name: run-airflow-migrations
-          image: {{ template "airflow_image" . }}
+          image: {{ template "default_airflow_image" . }}
           imagePullPolicy: {{ .Values.images.airflow.pullPolicy }}
           args: ["airflow", "upgradedb"]
           env:

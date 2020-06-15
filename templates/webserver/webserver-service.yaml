@@ -14,25 +14,14 @@ metadata:
 {{- with .Values.labels }}
 {{ toYaml . | indent 4 }}
 {{- end }}
-
-{{- if .Values.awsEnabled }}
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-{{- end }}
 spec:
-{{- if .Values.awsEnabled }}
-  type: LoadBalancer
-{{- else}}
   type: ClusterIP
-{{- end }}
   selector:
     tier: airflow
     component: webserver
     release: {{ .Release.Name }}
   ports:
-  - name: http
-    port: 80
-    targetPort: {{ .Values.ports.airflowUI }}
-  - name: https
-    port: 443
-    targetPort: {{ .Values.ports.airflowUI }}
+    - name: airflow-ui
+      protocol: TCP
+      port: {{ .Values.ports.airflowUI }}
+      targetPort: {{ .Values.ports.airflowUI }}
